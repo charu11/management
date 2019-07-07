@@ -95,3 +95,17 @@ app.use(bodyParser.urlencoded({
           }
       });
   }
+
+
+//login required
+
+
+  exports.loginRequired = function(req, res, next){
+    console.log("###### login required ######");
+    console.log(req.headers)
+    if(req.user){
+      next()
+    } else {
+      return res.status(401).json({ message: 'Unauthorized user!' });
+    }
+  };
