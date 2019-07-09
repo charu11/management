@@ -66,3 +66,62 @@ app.use(bodyParser.urlencoded({
 
     });
   };
+
+
+  //user login
+
+  exports.signin = function(req, res){
+      console.log('sign in');
+    User.findone({'email': req.body.email})
+    .exec(function(err, user){
+        if(err){
+            throw err;
+            console.log('error occured');
+
+        }else{
+            if(user != null){
+                if(bcrypt.compareSync(req.body.password, user.password)){
+                    user.password = undefined;
+                    res.json({ message: 'success', details: "Login successfully", content: user, token: jwt.sign({ name: user.name ,email: user.email,  _id: user._id}, 'RESTFULAPIs') });
+                }else{
+                    res.json({message: 'failed ', details: 'login has failed'});
+                      console.log('login has failed');
+                  
+                }
+            }else{
+                console.log('user is null data. user is not registered, please register first');
+            }
+        }
+    });
+  };
+
+  //user update
+
+  exports.update = function(req,res){
+      console.log('updating the user');
+      User.findById(userId = req.body.userId)
+      .exec(function(err, user){
+          if(err){
+              console.log('error occured no chance to go more further');
+              throw err;
+          }else{
+              if(user != null){
+                  var newValues = {
+                      $set: {
+                          name: req.body.name,
+                          country: req.body.country
+
+                      }
+                  };
+                  User.findByIdAndUpdate(req.body.usreId, newValues, function(err, user){
+                      if(err){
+                          throw err;
+                          console.log('error occured');
+                      }else{
+                          res.json({message: 'success', details: 'user update succeeded', status: user})
+                      }
+                  });
+              }
+          }
+      });
+  };
